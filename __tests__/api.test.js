@@ -7,8 +7,8 @@ const data = require("../db/data/test-data");
 beforeEach(() => seed(data));
 afterAll(() => db.end());
 
-describe("/api", () => {
-  it("GET - 200: Responds with message 'connection ok'", () => {
+describe("/api/health-check", () => {
+  it("GET:200. Responds with message 'connection ok'", () => {
     return request(app)
       .get("/api/health-check")
       .expect(200)
@@ -21,7 +21,7 @@ describe("/api", () => {
 });
 
 describe("/api/topics", () => {
-  test("GET:200 sends an array of topics to the client", () => {
+  test("GET:200. Sends an array of topics to the client", () => {
     return request(app)
       .get("/api/topics")
       .expect(200)
@@ -34,6 +34,38 @@ describe("/api/topics", () => {
             description: expect.any(String),
           });
         });
+      });
+  });
+});
+
+describe("/api/articles", () => {
+  test("GET:200. Sends an array of articles to the client", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.articles).toEqual(expect.any(Array));
+        expect(res.body.articles.length).toBeGreaterThan(0);
+        res.body.articles.forEach((article) => {
+          article.comment_count = Number(article.comment_count)
+          expect(article).toMatchObject({
+            article_id: expect.any(Number),
+            author: expect.any(String),
+            title: expect.any(String),
+            topic: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            comment_count: expect.any(Number),
+          });
+        });
+      });
+  });
+  test("GET: 200. Default sorts by descending date created", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.articles).toBeSorted({ key: "created_at",  descending: true});
       });
   });
 });

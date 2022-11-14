@@ -1,4 +1,4 @@
-const { checkConnection, getTopics } = require("./controllers/topics.controller.js");
+const { checkConnection, getTopics, getArticles } = require("./controllers/topics.controller.js");
 const express = require("express");
 const app = express();
 app.use(express.json());
@@ -6,6 +6,7 @@ app.use(express.json());
 // endpoints
 app.get("/api/health-check", checkConnection);
 app.get("/api/topics", getTopics);
+app.get("/api/articles", getArticles)
 
 //error handling
 app.use((err, req, res, next) => {
