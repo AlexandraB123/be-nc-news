@@ -10,7 +10,7 @@ afterAll(() => db.end());
 describe("/api", () => {
   it("GET - 200: Responds with message 'connection ok'", () => {
     return request(app)
-      .get("/api")
+      .get("/api/health-check")
       .expect(200)
       .then((res) => {
         expect(res.body).toEqual({
