@@ -2,7 +2,8 @@
 
 ## Set up
 
-When cloning this repo the envrionment variables need to be set up locally.
+After cloning the repo locally, the following initial steps must be followed to complete local set up.
 
-1) Create a .env.test file in the root of the directory and add "PGDATABASE=nc_news_test" to it.
-2) Create a .env.development file in the root of the directory and add "PGDATABASE=nc_news" to it.
+1. Run the command 'npm install' in the terminal to install the required dependencies.
+
+2. Run the command 'npm run setup' in the terminal to create the required local files for development and testing, including .env.development and .env.test files. A query.sql files will also be created, which can be used to test sql queries. It can be run with the terminal command "npm run query", which will send the output to a query.txt file. Note that all the files created by 'npm run setup' are git-ignored.
