@@ -25,9 +25,10 @@ describe("/api/topics", () => {
     return request(app)
       .get("/api/topics")
       .expect(200)
-      .then((response) => {
-        expect(response.body.topics).toEqual(expect.any(Array));
-        response.body.topics.forEach((topic) => {
+      .then((res) => {
+        expect(res.body.topics).toEqual(expect.any(Array));
+        expect(res.body.topics.length).toBeGreaterThan(0);
+        res.body.topics.forEach((topic) => {
           expect(topic).toMatchObject({
             slug: expect.any(String),
             description: expect.any(String),
