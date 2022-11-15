@@ -12,7 +12,6 @@ exports.fetchArticles = () => {
 };
 
 exports.fetchArticleById = (article_id) => {
-
   if (!/^\d+$/.test(article_id)) {
     return Promise.reject({ status: 400, msg: "Invalid id" });
   }
@@ -30,4 +29,13 @@ exports.fetchArticleById = (article_id) => {
       return result.rows[0];
     }
   });
+};
+
+exports.fetchArticleComments = (article_id) => {
+  const queryString = `SELECT * FROM comments WHERE article_id = $1`;
+  return this.fetchArticleById(article_id)
+    .then(() => {
+      return db.query(queryString, [article_id]);
+    })
+    .then((result) => result.rows);
 };
