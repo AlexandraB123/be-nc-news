@@ -144,7 +144,7 @@ describe("/api/articles/:article_id/comments", () => {
   });
   test("GET:400 sends an appropriate and error message when given an invalid id", () => {
     return request(app)
-      .get("/api/articles/not-an-article")
+      .get("/api/articles/not-an-article/comments")
       .expect(400)
       .then(({ body }) => {
         expect(body.msg).toBe("Invalid id");
