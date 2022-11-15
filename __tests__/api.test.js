@@ -153,7 +153,7 @@ describe.only("/api/articles/:article_id/comments", () => {
 
   test("POST:201. Inserts a new comment to the db and sends the new comment back to the client", () => {
     const newComment = {
-      username: "new_user",
+      username: "lurker",
       body: "comment for testing",
     };
     return request(app)
@@ -162,12 +162,12 @@ describe.only("/api/articles/:article_id/comments", () => {
       .expect(201)
       .then((response) => {
         expect(response.body.comment).toMatchObject({
-          comment_id: 19,
+          comment_id: expect.any(Number),
           article_id: 1,
-          author: "hi",
+          created_at: expect.any(String),
           votes: 0,
-          author: newComment.username,
-          body: newComment.body,
+          author: "lurker",
+          body: "comment for testing",
         });
       });
   });
@@ -189,20 +189,43 @@ describe.only("/api/articles/:article_id/comments", () => {
         expect(response.body.msg).toBe("Bad request");
       });
   });
-  test("POST:404. Sends an appropriate and error message when given a valid but non-existent id", () => {
+  test("POST:404. Sends an appropriate error message when given a valid but non-existent id", () => {
+    const newComment = {
+      username: "lurker",
+      body: "comment for testing",
+    };
     return request(app)
       .post("/api/articles/999/comments")
+      .send(newComment)
       .expect(404)
       .then(({ body }) => {
         expect(body.msg).toBe("article does not exist");
       });
   });
-  test("GET:400 sends an appropriate and error message when given an invalid id", () => {
+  test("POST:400. Sends an appropriate error message when given an invalid id", () => {
+    const newComment = {
+      username: "lurker",
+      body: "comment for testing",
+    };
     return request(app)
       .post("/api/articles/not-an-article/comments")
+      .send(newComment)
       .expect(400)
       .then(({ body }) => {
         expect(body.msg).toBe("Invalid id");
+      });
+  });
+  test("POST:400. Sends an appropriate error message when given an invalid username", () => {
+    const newComment = {
+      username: "not_a_valid_username",
+      body: "comment for testing",
+    };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(newComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid username");
       });
   });
 });

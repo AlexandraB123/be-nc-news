@@ -1,4 +1,5 @@
 const db = require("../db/connection");
+const { checkUserExists } = require("../utils/utils.js");
 
 exports.fetchArticles = () => {
   const queryString = `
@@ -34,4 +35,21 @@ exports.fetchArticleComments = (article_id) => {
       return db.query(queryString, [article_id]);
     })
     .then((result) => result.rows);
+};
+
+exports.addArticleComment = (article_id, body) => {
+  if (!body.username || !body.body)
+    return Promise.reject({ status: 400, msg: "Bad request" });
+  return this.fetchArticleById(article_id)
+    .then(() => checkUserExists(body.username))
+    .then(() => {
+      const queryString = `
+        INSERT INTO comments (article_id, author, body, votes)
+        VALUES ($1, $2, $3, 0)
+        RETURNING *;`;
+      return db.query(queryString, [article_id, body.username, body.body]);
+    })
+    .then((result) => {
+      return result.rows[0];
+    });
 };
