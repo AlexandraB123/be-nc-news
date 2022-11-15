@@ -47,7 +47,7 @@ describe("/api/articles", () => {
         expect(res.body.articles).toEqual(expect.any(Array));
         expect(res.body.articles.length).toBeGreaterThan(0);
         res.body.articles.forEach((article) => {
-          article.comment_count = Number(article.comment_count)
+          article.comment_count = Number(article.comment_count);
           expect(article).toMatchObject({
             article_id: expect.any(Number),
             author: expect.any(String),
@@ -65,7 +65,45 @@ describe("/api/articles", () => {
       .get("/api/articles")
       .expect(200)
       .then((res) => {
-        expect(res.body.articles).toBeSorted({ key: "created_at",  descending: true});
+        expect(res.body.articles).toBeSorted({
+          key: "created_at",
+          descending: true,
+        });
+      });
+  });
+});
+
+describe.only("/api/articles/:article_id", () => {
+  test("GET:200. Sends a single article to the client", () => {
+    return request(app)
+      .get("/api/articles/1")
+      .expect(200)
+      .then((response) => {
+        expect(response.body.article).toMatchObject({
+          article_id: expect.any(Number),
+          author: expect.any(String),
+          title: expect.any(String),
+          body: expect.any(String),
+          topic: expect.any(String),
+          created_at: expect.any(String),
+          votes: expect.any(Number),
+        });
+      });
+  });
+  test("GET:404 sends an appropriate and error message when given a valid but non-existent id", () => {
+    return request(app)
+      .get("/api/articles/999")
+      .expect(404)
+      .then((response) => {
+        expect(response.body.msg).toBe("article does not exist");
+      });
+  });
+  test("GET:400 sends an appropriate and error message when given an invalid id", () => {
+    return request(app)
+      .get("/api/articles/not-an-article")
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe("Invalid id");
       });
   });
 });
