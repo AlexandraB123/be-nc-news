@@ -73,37 +73,111 @@ describe("/api/articles", () => {
 });
 
 describe("/api/articles/:article_id", () => {
-  test("GET:200. Sends a single article to the client", () => {
-    return request(app)
-      .get("/api/articles/1")
-      .expect(200)
-      .then((response) => {
-        expect(response.body.article).toMatchObject({
-          article_id: 1,
-          author: expect.any(String),
-          title: expect.any(String),
-          body: expect.any(String),
-          topic: expect.any(String),
-          created_at: expect.any(String),
-          votes: expect.any(Number),
+  describe("GET", () => {
+    test("GET:200. Sends a single article to the client", () => {
+      return request(app)
+        .get("/api/articles/1")
+        .expect(200)
+        .then((response) => {
+          expect(response.body.article).toMatchObject({
+            article_id: 1,
+            author: expect.any(String),
+            title: expect.any(String),
+            body: expect.any(String),
+            topic: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+          });
         });
-      });
+    });
+    test("GET:404 sends an appropriate and error message when given a valid but non-existent id", () => {
+      return request(app)
+        .get("/api/articles/999")
+        .expect(404)
+        .then((response) => {
+          expect(response.body.msg).toBe("article does not exist");
+        });
+    });
+    test("GET:400 sends an appropriate and error message when given an invalid id", () => {
+      return request(app)
+        .get("/api/articles/not-an-article")
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe("Invalid id");
+        });
+    });
   });
-  test("GET:404 sends an appropriate and error message when given a valid but non-existent id", () => {
-    return request(app)
-      .get("/api/articles/999")
-      .expect(404)
-      .then((response) => {
-        expect(response.body.msg).toBe("article does not exist");
-      });
-  });
-  test("GET:400 sends an appropriate and error message when given an invalid id", () => {
-    return request(app)
-      .get("/api/articles/not-an-article")
-      .expect(400)
-      .then((response) => {
-        expect(response.body.msg).toBe("Invalid id");
-      });
+  describe("PATCH", () => {
+    test("PATCH: 200. Responds with newly updated article when given votes to add", () => {
+      return request(app)
+        .patch("/api/articles/1")
+        .send({ inc_votes: 1 })
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.article).toMatchObject({
+            article_id: 1,
+            author: expect.any(String),
+            title: expect.any(String),
+            body: expect.any(String),
+            topic: expect.any(String),
+            created_at: expect.any(String),
+            votes: 101,
+          });
+        });
+    });
+    test("PATCH: 200. Responds with newly updated article when given votes to take away", () => {
+      return request(app)
+        .patch("/api/articles/1")
+        .send({ inc_votes: -10 })
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.article).toMatchObject({
+            article_id: 1,
+            author: expect.any(String),
+            title: expect.any(String),
+            body: expect.any(String),
+            topic: expect.any(String),
+            created_at: expect.any(String),
+            votes: 90,
+          });
+        });
+    });
+    test("PATCH: 404. Sends an appropriate error message when given a valid but non-existent id", () => {
+      return request(app)
+        .patch("/api/articles/999")
+        .send({ inc_votes: 1 })
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("article does not exist");
+        });
+    });
+    test("PATCH:400. Sends an appropriate error message when given an invalid id", () => {
+      return request(app)
+        .patch("/api/articles/not-an-article")
+        .send({ inc_votes: 1 })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Invalid id");
+        });
+    });
+    test("PATCH: 400. Sends an appropriate error message when given an invalid request (no inc_votes key)", () => {
+      return request(app)
+        .patch("/api/articles/1")
+        .send({ not_an_inc_votes_key: 1 })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad request");
+        });
+    });
+    test("PATCH: 400. Sends an appropriate error message when given an invalid request (incVotes value is not a number)", () => {
+      return request(app)
+        .patch("/api/articles/1")
+        .send({ inc_votes: "hi" })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad request");
+        });
+    });
   });
 });
 
@@ -149,6 +223,84 @@ describe("/api/articles/:article_id/comments", () => {
       .expect(400)
       .then(({ body }) => {
         expect(body.msg).toBe("Invalid id");
+      });
+  });
+
+  test("POST:201. Inserts a new comment to the db and sends the new comment back to the client", () => {
+    const newComment = {
+      username: "lurker",
+      body: "comment for testing",
+    };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(newComment)
+      .expect(201)
+      .then((response) => {
+        expect(response.body.comment).toMatchObject({
+          comment_id: expect.any(Number),
+          article_id: 1,
+          created_at: expect.any(String),
+          votes: 0,
+          author: "lurker",
+          body: "comment for testing",
+        });
+      });
+  });
+  test("POST:400. Responds with an appropriate error message when provided with a bad comment (no username)", () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send({ body: "comment for testing" })
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe("Bad request");
+      });
+  });
+  test("POST:400. Responds with an appropriate error message when provided with a bad comment (no body)", () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send({ username: "new_user" })
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe("Bad request");
+      });
+  });
+  test("POST:404. Sends an appropriate error message when given a valid but non-existent id", () => {
+    const newComment = {
+      username: "lurker",
+      body: "comment for testing",
+    };
+    return request(app)
+      .post("/api/articles/999/comments")
+      .send(newComment)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("article does not exist");
+      });
+  });
+  test("POST:400. Sends an appropriate error message when given an invalid id", () => {
+    const newComment = {
+      username: "lurker",
+      body: "comment for testing",
+    };
+    return request(app)
+      .post("/api/articles/not-an-article/comments")
+      .send(newComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid id");
+      });
+  });
+  test("POST:400. Sends an appropriate error message when given an invalid username", () => {
+    const newComment = {
+      username: "not_a_valid_username",
+      body: "comment for testing",
+    };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(newComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid username");
       });
   });
 });
