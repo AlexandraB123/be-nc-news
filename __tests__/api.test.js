@@ -47,7 +47,6 @@ describe("/api/articles", () => {
         expect(res.body.articles).toEqual(expect.any(Array));
         expect(res.body.articles.length).toBeGreaterThan(0);
         res.body.articles.forEach((article) => {
-          article.comment_count = Number(article.comment_count)
           expect(article).toMatchObject({
             article_id: expect.any(Number),
             author: expect.any(String),
