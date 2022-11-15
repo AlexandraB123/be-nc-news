@@ -12,11 +12,6 @@ exports.fetchArticles = () => {
 };
 
 exports.fetchArticleById = (article_id) => {
-
-  if (!/^\d+$/.test(article_id)) {
-    return Promise.reject({ status: 400, msg: "Invalid id" });
-  }
-
   const queryString = `
     SELECT users.username AS author, articles.title, articles.article_id, articles.topic, articles.body, articles.created_at, articles.votes
     FROM articles
