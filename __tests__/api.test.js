@@ -114,6 +114,7 @@ describe("/api/articles/:article_id/comments", () => {
       .expect(200)
       .then(({ body }) => {
         expect(body.comments).toEqual(expect.any(Array));
+        expect(body.comments.length).toBeGreaterThan(0);
         body.comments.forEach((comment) => {
           expect(comment).toMatchObject({
             comment_id: expect.any(Number),
