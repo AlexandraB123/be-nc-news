@@ -107,7 +107,7 @@ describe("/api/articles/:article_id", () => {
   });
 });
 
-describe("/api/articles/:article_id/comments", () => {
+describe.only("/api/articles/:article_id/comments", () => {
   test("GET:200. Sends an array of comments belonging to a single article to the client", () => {
     return request(app)
       .get("/api/articles/1/comments")
@@ -145,6 +145,61 @@ describe("/api/articles/:article_id/comments", () => {
   test("GET:400 sends an appropriate and error message when given an invalid id", () => {
     return request(app)
       .get("/api/articles/not-an-article")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid id");
+      });
+  });
+
+  test("POST:201. Inserts a new comment to the db and sends the new comment back to the client", () => {
+    const newComment = {
+      username: "new_user",
+      body: "comment for testing",
+    };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(newComment)
+      .expect(201)
+      .then((response) => {
+        expect(response.body.comment).toMatchObject({
+          comment_id: 19,
+          article_id: 1,
+          author: "hi",
+          votes: 0,
+          author: newComment.username,
+          body: newComment.body,
+        });
+      });
+  });
+  test("POST:400. Responds with an appropriate error message when provided with a bad comment (no username)", () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send({ body: "comment for testing" })
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe("Bad request");
+      });
+  });
+  test("POST:400. Responds with an appropriate error message when provided with a bad comment (no body)", () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send({ username: "new_user" })
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe("Bad request");
+      });
+  });
+  test("POST:404. Sends an appropriate and error message when given a valid but non-existent id", () => {
+    return request(app)
+      .post("/api/articles/999/comments")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("article does not exist");
+      });
+  });
+  test("GET:400 sends an appropriate and error message when given an invalid id", () => {
+    return request(app)
+      .post("/api/articles/not-an-article/comments")
       .expect(400)
       .then(({ body }) => {
         expect(body.msg).toBe("Invalid id");
