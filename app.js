@@ -12,10 +12,18 @@ app.get("/api/articles/:article_id", getArticleById)
 app.get("/api/articles/:article_id/comments", getArticleComments)
 
 //error handling
+
 // manual errors
 app.use((err, req, res, next) => {
   if (err.status && err.msg) {
     res.status(err.status).send({ msg: err.msg });
+  } else next(err);
+});
+
+// psql errors
+app.use((err, req, res, next) => {
+  if (err.code === "22P02") {
+    res.status(400).send({ msg: "Invalid id" });
   } else next(err);
 });
 
@@ -24,7 +32,5 @@ app.use((err, req, res, next) => {
   console.log(err);
   res.status(500).send({ msg: "Internal Server Error" });
 });
-
-
 
 module.exports = app;
