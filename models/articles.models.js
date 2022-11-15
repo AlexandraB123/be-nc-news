@@ -53,3 +53,20 @@ exports.addArticleComment = (article_id, body) => {
       return result.rows[0];
     });
 };
+
+exports.updateArticle = (article_id, body) => {
+  if (typeof body.inc_votes !== "number")
+    return Promise.reject({ status: 400, msg: "Bad request" });
+  return this.fetchArticleById(article_id)
+    .then(() => {
+      const queryString = `
+      UPDATE articles
+      SET votes = votes + $2
+      WHERE article_id = $1
+      RETURNING *;`;
+      return db.query(queryString, [article_id, body.inc_votes]);
+    })
+    .then((result) => {
+      return result.rows[0];
+    });
+};
