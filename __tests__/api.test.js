@@ -117,7 +117,7 @@ describe("/api/articles/:article_id/comments", () => {
         body.comments.forEach((comment) => {
           expect(comment).toMatchObject({
             comment_id: expect.any(Number),
-            article_id: expect.any(Number),
+            article_id: 1,
             votes: expect.any(Number),
             created_at: expect.any(String),
             author: expect.any(String),
