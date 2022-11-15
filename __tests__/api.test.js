@@ -73,7 +73,7 @@ describe("/api/articles", () => {
   });
 });
 
-describe.only("/api/articles/:article_id", () => {
+describe("/api/articles/:article_id", () => {
   test("GET:200. Sends a single article to the client", () => {
     return request(app)
       .get("/api/articles/1")
