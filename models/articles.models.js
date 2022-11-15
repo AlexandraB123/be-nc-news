@@ -10,3 +10,19 @@ exports.fetchArticles = () => {
   `;
   return db.query(queryString).then((result) => result.rows);
 };
+
+exports.fetchArticleById = (article_id) => {
+  const queryString = `
+    SELECT users.username AS author, articles.title, articles.article_id, articles.topic, articles.body, articles.created_at, articles.votes
+    FROM articles
+    LEFT JOIN users ON articles.author = users.username
+    WHERE article_id = $1;
+  `;
+  return db.query(queryString, [article_id]).then((result) => {
+    if (result.rows.length === 0) {
+      return Promise.reject({ status: 404, msg: "article does not exist" });
+    } else {
+      return result.rows[0];
+    }
+  });
+};
