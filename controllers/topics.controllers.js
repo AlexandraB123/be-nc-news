@@ -1,4 +1,4 @@
-const { fetchTopics } = require("../models/topics.model.js");
+const { fetchTopics } = require("../models/topics.models.js");
 
 exports.checkConnection = (req, res) => {
   res.send({ message: "connection ok" });
