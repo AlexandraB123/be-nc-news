@@ -70,7 +70,7 @@ describe("/api/articles", () => {
         });
       });
   });
-  describe("GET - queries", () => {
+  describe.skip("GET - queries", () => {
     test("GET: 200. Filters by topic if given valid search topic", () => {
       return request(app)
         .get("/api/articles?topic=mitch")
