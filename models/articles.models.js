@@ -29,7 +29,7 @@ exports.fetchArticleById = (article_id) => {
 };
 
 exports.fetchArticleComments = (article_id) => {
-  const queryString = `SELECT * FROM comments WHERE article_id = $1`;
+  const queryString = `SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC;`;
   return this.fetchArticleById(article_id)
     .then(() => {
       return db.query(queryString, [article_id]);
@@ -44,8 +44,8 @@ exports.addArticleComment = (article_id, body) => {
     .then(() => checkUserExists(body.username))
     .then(() => {
       const queryString = `
-        INSERT INTO comments (article_id, author, body, votes)
-        VALUES ($1, $2, $3, 0)
+        INSERT INTO comments (article_id, author, body)
+        VALUES ($1, $2, $3)
         RETURNING *;`;
       return db.query(queryString, [article_id, body.username, body.body]);
     })

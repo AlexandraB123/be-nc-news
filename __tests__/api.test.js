@@ -281,6 +281,17 @@ describe("/api/articles/:article_id/comments", () => {
         });
       });
   });
+  test("GET: 200. Default sorts by descending date created", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments).toBeSorted({
+          key: "created_at",
+          descending: true,
+        });
+      });
+  });
   test("GET: 200. Sends empty array when article has no comments", () => {
     return request(app)
       .get("/api/articles/2/comments")
@@ -306,6 +317,26 @@ describe("/api/articles/:article_id/comments", () => {
       });
   });
 
+  test("POST:201. Inserts a new comment to the db and sends the new comment back to the client", () => {
+    const newComment = {
+      username: "lurker",
+      body: "comment for testing",
+    };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(newComment)
+      .expect(201)
+      .then((response) => {
+        expect(response.body.comment).toMatchObject({
+          comment_id: expect.any(Number),
+          article_id: 1,
+          created_at: expect.any(String),
+          votes: 0,
+          author: "lurker",
+          body: "comment for testing",
+        });
+      });
+  });
   test("POST:201. Inserts a new comment to the db and sends the new comment back to the client", () => {
     const newComment = {
       username: "lurker",
@@ -370,7 +401,7 @@ describe("/api/articles/:article_id/comments", () => {
         expect(body.msg).toBe("Invalid id");
       });
   });
-  test("POST:400. Sends an appropriate error message when given an invalid username", () => {
+  test("POST:404. Sends an appropriate error message when given an invalid username", () => {
     const newComment = {
       username: "not_a_valid_username",
       body: "comment for testing",
@@ -378,9 +409,9 @@ describe("/api/articles/:article_id/comments", () => {
     return request(app)
       .post("/api/articles/1/comments")
       .send(newComment)
-      .expect(400)
+      .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe("Invalid username");
+        expect(body.msg).toBe("Username not found");
       });
   });
 });
