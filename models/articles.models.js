@@ -44,8 +44,8 @@ exports.addArticleComment = (article_id, body) => {
     .then(() => checkUserExists(body.username))
     .then(() => {
       const queryString = `
-        INSERT INTO comments (article_id, author, body, votes)
-        VALUES ($1, $2, $3, 0)
+        INSERT INTO comments (article_id, author, body)
+        VALUES ($1, $2, $3)
         RETURNING *;`;
       return db.query(queryString, [article_id, body.username, body.body]);
     })
