@@ -92,7 +92,7 @@ describe("/api/articles", () => {
         .get("/api/articles?topic=paper")
         .expect(200)
         .then(({ body }) => {
-          expect(body.articles).toEqual([])
+          expect(body.articles).toEqual([]);
         });
     });
     test("GET: 400. Sends appropriate error message if given invalid search topic", () => {
@@ -100,7 +100,7 @@ describe("/api/articles", () => {
         .get("/api/articles?topic=not_a_topic")
         .expect(400)
         .then(({ body }) => {
-          expect(body.articles.msg).toBe("Bad request")
+          expect(body.articles.msg).toBe("Bad request");
         });
     });
     test("GET: 200. Sorts by column if given valid search sort_by column", () => {
@@ -108,13 +108,47 @@ describe("/api/articles", () => {
         .get("/api/articles?sort_by=title")
         .expect(200)
         .then(({ body }) => {
-          expect(body.articles).toBeSorted({ key: "title", descending: true});
+          expect(body.articles).toBeSorted({ key: "title", descending: true });
         });
     });
-    test("GET: 200. Default sorts by date_created if given invalid search sort_by column", () => {});
-    test("GET: 200. Sorts by ascending if given search order of asc", () => {});
-    test("GET: 200. Sorts by descending if given search order of desc", () => {});
-    test("GET: 200. Default sorts by descending if given invalid search order", () => {});
+    test("GET: 200. Default sorts by date_created if given invalid search sort_by column", () => {
+      return request(app)
+        .get("/api/articles?sort_by=not_a_column")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad request");
+        });
+    });
+    test("GET: 200. Sorts by ascending if given search order of asc", () => {
+      return request(app)
+        .get("/api/articles?order=asc")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles).toBeSorted({ key: "created_at" });
+        });
+    });
+    test("GET: 200. Sorts by descending if given search order of desc", () => {
+      return request(app)
+        .get("/api/articles?order=desc")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles).toBeSorted({
+            key: "created_at",
+            descending: true,
+          });
+        });
+    });
+    test("GET: 200. Default sorts by descending if given invalid search order", () => {
+      return request(app)
+        .get("/api/articles?order=not_asc_or_desc")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles).toBeSorted({
+            key: "created_at",
+            descending: true,
+          });
+        });
+    });
   });
 });
 
