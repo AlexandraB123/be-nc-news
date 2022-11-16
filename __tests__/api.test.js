@@ -107,7 +107,7 @@ describe("/api/articles/:article_id", () => {
   });
 });
 
-describe.only("/api/articles/:article_id/comments", () => {
+describe("/api/articles/:article_id/comments", () => {
   test("GET:200. Sends an array of comments belonging to a single article to the client", () => {
     return request(app)
       .get("/api/articles/1/comments")
