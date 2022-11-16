@@ -70,6 +70,52 @@ describe("/api/articles", () => {
         });
       });
   });
+  describe("GET - queries", () => {
+    test("GET: 200. Filters by topic if given valid search topic", () => {
+      return request(app)
+        .get("/api/articles?topic=mitch")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles).toMatchObject({
+            article_id: expect.any(Number),
+            author: expect.any(String),
+            title: expect.any(String),
+            topic: "mitch",
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            comment_count: expect.any(Number),
+          });
+        });
+    });
+    test("GET: 200. Returns empty array if given valid search topic when no articles are on that topic", () => {
+      return request(app)
+        .get("/api/articles?topic=paper")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles).toEqual([])
+        });
+    });
+    test("GET: 400. Sends appropriate error message if given invalid search topic", () => {
+      return request(app)
+        .get("/api/articles?topic=not_a_topic")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.articles.msg).toBe("Bad request")
+        });
+    });
+    test("GET: 200. Sorts by column if given valid search sort_by column", () => {
+      return request(app)
+        .get("/api/articles?sort_by=title")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles).toBeSorted({ key: "title", descending: true});
+        });
+    });
+    test("GET: 200. Default sorts by date_created if given invalid search sort_by column", () => {});
+    test("GET: 200. Sorts by ascending if given search order of asc", () => {});
+    test("GET: 200. Sorts by descending if given search order of desc", () => {});
+    test("GET: 200. Default sorts by descending if given invalid search order", () => {});
+  });
 });
 
 describe("/api/articles/:article_id", () => {
