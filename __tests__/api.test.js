@@ -38,7 +38,7 @@ describe("/api/topics", () => {
   });
 });
 
-describe("/api/articles", () => {
+describe.skip("/api/articles", () => {
   test("GET:200. Sends an array of articles to the client", () => {
     return request(app)
       .get("/api/articles")
@@ -70,20 +70,24 @@ describe("/api/articles", () => {
         });
       });
   });
-  describe.skip("GET - queries", () => {
+  describe("GET - queries", () => {
     test("GET: 200. Filters by topic if given valid search topic", () => {
       return request(app)
         .get("/api/articles?topic=mitch")
         .expect(200)
         .then(({ body }) => {
-          expect(body.articles).toMatchObject({
-            article_id: expect.any(Number),
-            author: expect.any(String),
-            title: expect.any(String),
-            topic: "mitch",
-            created_at: expect.any(String),
-            votes: expect.any(Number),
-            comment_count: expect.any(Number),
+          expect(body.articles).toEqual(expect.any(Array));
+          expect(body.articles.length).toBeGreaterThan(0);
+          body.articles.forEach((article) => {
+            expect(article).toMatchObject({
+              article_id: expect.any(Number),
+              author: expect.any(String),
+              title: expect.any(String),
+              topic: "mitch",
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              comment_count: expect.any(Number),
+            });
           });
         });
     });

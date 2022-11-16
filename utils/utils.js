@@ -9,3 +9,13 @@ exports.checkUserExists = (username) => {
       }
     });
 };
+
+exports.checkTopicExists = (topic) => {
+  return db
+    .query(`SELECT *  FROM articles WHERE topic = $1`, [topic])
+    .then((result) => {
+      if (result.rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "topic not found" });
+      }
+    });
+};
