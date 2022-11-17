@@ -38,7 +38,7 @@ describe("/api/topics", () => {
   });
 });
 
-describe.skip("/api/articles", () => {
+describe("/api/articles", () => {
   test("GET:200. Sends an array of articles to the client", () => {
     return request(app)
       .get("/api/articles")
@@ -70,7 +70,7 @@ describe.skip("/api/articles", () => {
         });
       });
   });
-  describe("GET - queries", () => {
+  describe.only("GET - queries", () => {
     test("GET: 200. Filters by topic if given valid search topic", () => {
       return request(app)
         .get("/api/articles?topic=mitch")
@@ -102,9 +102,9 @@ describe.skip("/api/articles", () => {
     test("GET: 400. Sends appropriate error message if given invalid search topic", () => {
       return request(app)
         .get("/api/articles?topic=not_a_topic")
-        .expect(400)
+        .expect(404)
         .then(({ body }) => {
-          expect(body.articles.msg).toBe("Bad request");
+          expect(body.msg).toBe("topic not found");
         });
     });
     test("GET: 200. Sorts by column if given valid search sort_by column", () => {
@@ -118,9 +118,9 @@ describe.skip("/api/articles", () => {
     test("GET: 200. Default sorts by date_created if given invalid search sort_by column", () => {
       return request(app)
         .get("/api/articles?sort_by=not_a_column")
-        .expect(400)
+        .expect(200)
         .then(({ body }) => {
-          expect(body.msg).toBe("Bad request");
+          expect(body.articles).toBeSorted({ key: "created_at", descending: true });
         });
     });
     test("GET: 200. Sorts by ascending if given search order of asc", () => {
