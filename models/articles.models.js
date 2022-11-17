@@ -1,5 +1,5 @@
 const db = require("../db/connection");
-const { checkUserExists, checkTopicExists } = require("../utils/utils.js");
+const { checkItemExists } = require("../utils/utils.js");
 
 exports.fetchArticles = (sort_by, order, topic) => {
   const validColumns = [
@@ -21,18 +21,22 @@ exports.fetchArticles = (sort_by, order, topic) => {
     LEFT JOIN comments ON articles.article_id = comments.article_id`;
   const queryStringOrderByGroupBy = ` GROUP BY articles.article_id ORDER BY ${sort_by} ${order};`;
 
-  if (topic === undefined) {
-    queryString += queryStringOrderByGroupBy;
-    return db.query(queryString).then((result) => result.rows);
-  }
-
-  return checkTopicExists(topic)
+  return Promise.all([])
     .then(() => {
-      queryString += ` WHERE topic = $1`;
-      queryString += queryStringOrderByGroupBy;
-      return db.query(queryString, [topic]);
+      if (topic !== undefined) {
+        return checkItemExists(topic, "topic", "topics", "slug");
+      }
     })
-    .then((result) => result.rows);
+    .then(() => {
+      if (topic !== undefined) {
+        queryString += ` WHERE topic = '${topic}'`;
+      }
+      queryString += queryStringOrderByGroupBy;
+      return db.query(queryString);
+    })
+    .then((result) => {
+      return result.rows;
+    });
 };
 
 exports.fetchArticleById = (article_id) => {
@@ -65,7 +69,7 @@ exports.addArticleComment = (article_id, body) => {
   if (!body.username || !body.body)
     return Promise.reject({ status: 400, msg: "Bad request" });
   return this.fetchArticleById(article_id)
-    .then(() => checkUserExists(body.username))
+    .then(() => checkItemExists(body.username, "username", "users", "username"))
     .then(() => {
       const queryString = `
         INSERT INTO comments (article_id, author, body)
