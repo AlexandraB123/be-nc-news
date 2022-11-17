@@ -120,7 +120,10 @@ describe("/api/articles", () => {
         .get("/api/articles?sort_by=not_a_column")
         .expect(200)
         .then(({ body }) => {
-          expect(body.articles).toBeSorted({ key: "created_at", descending: true });
+          expect(body.articles).toBeSorted({
+            key: "created_at",
+            descending: true,
+          });
         });
     });
     test("GET: 200. Sorts by ascending if given search order of asc", () => {
@@ -171,6 +174,7 @@ describe("/api/articles/:article_id", () => {
             topic: expect.any(String),
             created_at: expect.any(String),
             votes: expect.any(Number),
+            comment_count: 11,
           });
         });
     });
