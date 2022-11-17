@@ -18,20 +18,24 @@ exports.fetchArticles = (sort_by, order, topic) => {
     SELECT articles.article_id, articles.author, articles.title, articles.topic, articles.created_at, articles.votes, CAST(COUNT(comments.comment_id) AS INT) AS comment_count 
     FROM articles
     LEFT JOIN comments ON articles.article_id = comments.article_id`;
-    const queryStringOrderByGroupBy = ` GROUP BY articles.article_id ORDER BY ${sort_by} ${order};`
-  
-  if (topic === undefined) {
-    queryString += queryStringOrderByGroupBy
-    return db.query(queryString).then((result) => result.rows)
-  }
+  const queryStringOrderByGroupBy = ` GROUP BY articles.article_id ORDER BY ${sort_by} ${order};`;
 
- return checkItemExists(topic, "topic", "topics", "slug")
+  return Promise.all([])
     .then(() => {
-      queryString += ` WHERE topic = $1`;
-      queryString += queryStringOrderByGroupBy
-      return db.query(queryString, [topic]);
+      if (topic !== undefined) {
+        return checkItemExists(topic, "topic", "topics", "slug");
+      }
     })
-    .then((result) => result.rows);
+    .then(() => {
+      if (topic !== undefined) {
+        queryString += ` WHERE topic = '${topic}'`;
+      }
+      queryString += queryStringOrderByGroupBy;
+      return db.query(queryString);
+    })
+    .then((result) => {
+      return result.rows;
+    });
 };
 
 exports.fetchArticleById = (article_id) => {
