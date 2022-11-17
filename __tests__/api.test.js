@@ -99,7 +99,7 @@ describe("/api/articles", () => {
           expect(body.articles).toEqual([]);
         });
     });
-    test("GET: 400. Sends appropriate error message if given invalid search topic", () => {
+    test("GET: 404. Sends appropriate error message if given invalid search topic", () => {
       return request(app)
         .get("/api/articles?topic=not_a_topic")
         .expect(404)
