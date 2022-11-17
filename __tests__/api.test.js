@@ -70,7 +70,7 @@ describe("/api/articles", () => {
         });
       });
   });
-  describe.only("GET - queries", () => {
+  describe("GET - queries", () => {
     test("GET: 200. Filters by topic if given valid search topic", () => {
       return request(app)
         .get("/api/articles?topic=mitch")
@@ -155,7 +155,7 @@ describe("/api/articles", () => {
           expect(body.articles).toBeSorted({ key: "created_at" });
         });
     });
-    test.only("GET: 200. Sorts by descending if given search order of desc", () => {
+    test("GET: 200. Sorts by descending if given search order of desc", () => {
       return request(app)
         .get("/api/articles?order=desc")
         .expect(200)

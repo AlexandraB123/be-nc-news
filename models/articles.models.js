@@ -26,6 +26,12 @@ exports.fetchArticles = (sort_by, order, topic) => {
       if (topic !== undefined) {
         return checkItemExists(topic, "topic", "topics", "slug");
       }
+      if (!validColumns.includes(sort_by)) {
+        return Promise.reject({ status: 404, msg: "sort_by column not found"})
+      }
+      if (!["asc", "desc"].includes(order)) {
+        return Promise.reject({ status: 400, msg: "invalid order"})
+      }
     })
     .then(() => {
       if (topic !== undefined) {
