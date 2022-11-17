@@ -11,24 +11,25 @@ exports.fetchArticles = (sort_by, order, topic) => {
     "created_at",
     "votes",
   ];
-  if (!validColumns.includes(sort_by)) sort_by = "created_at";
-  if (!["asc", "desc"].includes(order)) order = "desc";
+
+  if (!sort_by) sort_by = "created_at";
+  if (!order) order = "desc";
 
   let queryString = `
     SELECT articles.article_id, articles.author, articles.title, articles.topic, articles.created_at, articles.votes, CAST(COUNT(comments.comment_id) AS INT) AS comment_count 
     FROM articles
     LEFT JOIN comments ON articles.article_id = comments.article_id`;
-    const queryStringOrderByGroupBy = ` GROUP BY articles.article_id ORDER BY ${sort_by} ${order};`
-  
+  const queryStringOrderByGroupBy = ` GROUP BY articles.article_id ORDER BY ${sort_by} ${order};`;
+
   if (topic === undefined) {
-    queryString += queryStringOrderByGroupBy
-    return db.query(queryString).then((result) => result.rows)
+    queryString += queryStringOrderByGroupBy;
+    return db.query(queryString).then((result) => result.rows);
   }
 
- return checkTopicExists(topic)
+  return checkTopicExists(topic)
     .then(() => {
       queryString += ` WHERE topic = $1`;
-      queryString += queryStringOrderByGroupBy
+      queryString += queryStringOrderByGroupBy;
       return db.query(queryString, [topic]);
     })
     .then((result) => result.rows);
