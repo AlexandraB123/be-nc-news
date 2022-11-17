@@ -443,7 +443,7 @@ describe("/api/users", () => {
   });
 });
 
-describe.only("/api/comments/:comment_id", () => {
+describe("/api/comments/:comment_id", () => {
   test('DELETE: 204. Deletes comment and returns no content', () => {
     return request(app)
     .delete("/api/comments/1")
