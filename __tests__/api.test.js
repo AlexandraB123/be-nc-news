@@ -120,7 +120,10 @@ describe("/api/articles", () => {
         .get("/api/articles?sort_by=not_a_column")
         .expect(200)
         .then(({ body }) => {
-          expect(body.articles).toBeSorted({ key: "created_at", descending: true });
+          expect(body.articles).toBeSorted({
+            key: "created_at",
+            descending: true,
+          });
         });
     });
     test("GET: 200. Sorts by ascending if given search order of asc", () => {
@@ -320,103 +323,104 @@ describe("/api/articles/:article_id/comments", () => {
         expect(body.msg).toBe("Invalid id");
       });
   });
-
-  test("POST:201. Inserts a new comment to the db and sends the new comment back to the client", () => {
-    const newComment = {
-      username: "lurker",
-      body: "comment for testing",
-    };
-    return request(app)
-      .post("/api/articles/1/comments")
-      .send(newComment)
-      .expect(201)
-      .then((response) => {
-        expect(response.body.comment).toMatchObject({
-          comment_id: expect.any(Number),
-          article_id: 1,
-          created_at: expect.any(String),
-          votes: 0,
-          author: "lurker",
-          body: "comment for testing",
+  describe("POST", () => {
+    test("POST:201. Inserts a new comment to the db and sends the new comment back to the client", () => {
+      const newComment = {
+        username: "lurker",
+        body: "comment for testing",
+      };
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send(newComment)
+        .expect(201)
+        .then((response) => {
+          expect(response.body.comment).toMatchObject({
+            comment_id: expect.any(Number),
+            article_id: 1,
+            created_at: expect.any(String),
+            votes: 0,
+            author: "lurker",
+            body: "comment for testing",
+          });
         });
-      });
-  });
-  test("POST:201. Inserts a new comment to the db and sends the new comment back to the client", () => {
-    const newComment = {
-      username: "lurker",
-      body: "comment for testing",
-    };
-    return request(app)
-      .post("/api/articles/1/comments")
-      .send(newComment)
-      .expect(201)
-      .then((response) => {
-        expect(response.body.comment).toMatchObject({
-          comment_id: expect.any(Number),
-          article_id: 1,
-          created_at: expect.any(String),
-          votes: 0,
-          author: "lurker",
-          body: "comment for testing",
+    });
+    test("POST:201. Inserts a new comment to the db and sends the new comment back to the client", () => {
+      const newComment = {
+        username: "lurker",
+        body: "comment for testing",
+      };
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send(newComment)
+        .expect(201)
+        .then((response) => {
+          expect(response.body.comment).toMatchObject({
+            comment_id: expect.any(Number),
+            article_id: 1,
+            created_at: expect.any(String),
+            votes: 0,
+            author: "lurker",
+            body: "comment for testing",
+          });
         });
-      });
-  });
-  test("POST:400. Responds with an appropriate error message when provided with a bad comment (no username)", () => {
-    return request(app)
-      .post("/api/articles/1/comments")
-      .send({ body: "comment for testing" })
-      .expect(400)
-      .then((response) => {
-        expect(response.body.msg).toBe("Bad request");
-      });
-  });
-  test("POST:400. Responds with an appropriate error message when provided with a bad comment (no body)", () => {
-    return request(app)
-      .post("/api/articles/1/comments")
-      .send({ username: "new_user" })
-      .expect(400)
-      .then((response) => {
-        expect(response.body.msg).toBe("Bad request");
-      });
-  });
-  test("POST:404. Sends an appropriate error message when given a valid but non-existent id", () => {
-    const newComment = {
-      username: "lurker",
-      body: "comment for testing",
-    };
-    return request(app)
-      .post("/api/articles/999/comments")
-      .send(newComment)
-      .expect(404)
-      .then(({ body }) => {
-        expect(body.msg).toBe("article does not exist");
-      });
-  });
-  test("POST:400. Sends an appropriate error message when given an invalid id", () => {
-    const newComment = {
-      username: "lurker",
-      body: "comment for testing",
-    };
-    return request(app)
-      .post("/api/articles/not-an-article/comments")
-      .send(newComment)
-      .expect(400)
-      .then(({ body }) => {
-        expect(body.msg).toBe("Invalid id");
-      });
-  });
-  test("POST:404. Sends an appropriate error message when given an invalid username", () => {
-    const newComment = {
-      username: "not_a_valid_username",
-      body: "comment for testing",
-    };
-    return request(app)
-      .post("/api/articles/1/comments")
-      .send(newComment)
-      .expect(404)
-      .then(({ body }) => {
-        expect(body.msg).toBe("Username not found");
-      });
+    });
+    test("POST:400. Responds with an appropriate error message when provided with a bad comment (no username)", () => {
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send({ body: "comment for testing" })
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe("Bad request");
+        });
+    });
+    test("POST:400. Responds with an appropriate error message when provided with a bad comment (no body)", () => {
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send({ username: "new_user" })
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe("Bad request");
+        });
+    });
+    test("POST:404. Sends an appropriate error message when given a valid but non-existent id", () => {
+      const newComment = {
+        username: "lurker",
+        body: "comment for testing",
+      };
+      return request(app)
+        .post("/api/articles/999/comments")
+        .send(newComment)
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("article does not exist");
+        });
+    });
+    test("POST:400. Sends an appropriate error message when given an invalid id", () => {
+      const newComment = {
+        username: "lurker",
+        body: "comment for testing",
+      };
+      return request(app)
+        .post("/api/articles/not-an-article/comments")
+        .send(newComment)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Invalid id");
+        });
+    });
+    test("POST:404. Sends an appropriate error message when given an invalid username", () => {
+      const newComment = {
+        username: "not_a_valid_username",
+        body: "comment for testing",
+      };
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send(newComment)
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("username not found");
+        });
+    });
   });
 });
 

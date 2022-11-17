@@ -1,5 +1,5 @@
 const db = require("../db/connection");
-const { checkUserExists, checkTopicExists } = require("../utils/utils.js");
+const { checkItemExists } = require("../utils/utils.js");
 
 exports.fetchArticles = (sort_by, order, topic) => {
   const validColumns = [
@@ -25,7 +25,7 @@ exports.fetchArticles = (sort_by, order, topic) => {
     return db.query(queryString).then((result) => result.rows)
   }
 
- return checkTopicExists(topic)
+ return checkItemExists(topic, "topic", "topics", "slug")
     .then(() => {
       queryString += ` WHERE topic = $1`;
       queryString += queryStringOrderByGroupBy
@@ -63,7 +63,7 @@ exports.addArticleComment = (article_id, body) => {
   if (!body.username || !body.body)
     return Promise.reject({ status: 400, msg: "Bad request" });
   return this.fetchArticleById(article_id)
-    .then(() => checkUserExists(body.username))
+    .then(() => checkItemExists(body.username, "username", "users", "username"))
     .then(() => {
       const queryString = `
         INSERT INTO comments (article_id, author, body)
