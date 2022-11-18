@@ -1,7 +1,7 @@
 const db = require("../db/connection");
 const { checkItemExists } = require("../utils/utils.js");
 
-exports.fetchArticles = (sort_by, order, topic) => {
+exports.fetchArticles = (sort_by = "created_at", order = "desc", topic) => {
   const validColumns = [
     "article_id",
     "title",
@@ -11,9 +11,6 @@ exports.fetchArticles = (sort_by, order, topic) => {
     "created_at",
     "votes",
   ];
-
-  if (!sort_by) sort_by = "created_at";
-  if (!order) order = "desc";
 
   let queryString = `
     SELECT articles.article_id, articles.author, articles.title, articles.topic, articles.created_at, articles.votes, CAST(COUNT(comments.comment_id) AS INT) AS comment_count 

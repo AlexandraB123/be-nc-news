@@ -171,7 +171,7 @@ describe("/api/articles", () => {
         .get("/api/articles?order=not_asc_or_desc")
         .expect(400)
         .then(({ body }) => {
-          expect(body.msg).toBe("invalid order")
+          expect(body.msg).toBe("invalid order");
         });
     });
   });
