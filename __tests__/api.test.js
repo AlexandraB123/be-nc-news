@@ -91,6 +91,30 @@ describe("/api/articles", () => {
           });
         });
     });
+    test("GET: 200. Ignores invalid queries and returns all articles", () => {
+      return request(app)
+        .get("/api/articles?not_a_valid_query=anything")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles).toEqual(expect.any(Array));
+          expect(body.articles.length).toBeGreaterThan(0);
+          expect(body.articles).toBeSorted({
+            key: "created_at",
+            descending: true,
+          });
+          body.articles.forEach((article) => {
+            expect(article).toMatchObject({
+              article_id: expect.any(Number),
+              author: expect.any(String),
+              title: expect.any(String),
+              topic: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              comment_count: expect.any(Number),
+            });
+          });
+        });
+    });
     test("GET: 200. Returns empty array if given valid search topic when no articles are on that topic", () => {
       return request(app)
         .get("/api/articles?topic=paper")
@@ -168,6 +192,7 @@ describe("/api/articles/:article_id", () => {
             topic: expect.any(String),
             created_at: expect.any(String),
             votes: expect.any(Number),
+            comment_count: 11,
           });
         });
     });
