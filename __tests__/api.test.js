@@ -492,3 +492,33 @@ describe("/api/users", () => {
       });
   });
 });
+
+describe("/api/comments/:comment_id", () => {
+  test("DELETE: 204. Deletes comment and returns no content", () => {
+    return request(app)
+      .delete("/api/comments/1")
+      .expect(204)
+      .then(() => {
+        return db.query("SELECT * FROM comments WHERE comment_id = 1");
+      })
+      .then((result) => {
+        expect(result.rows.length).toBe(0);
+      });
+  });
+  test("DELETE: 400. Sends appropriate error message if invalid id given", () => {
+    return request(app)
+      .delete("/api/comments/not_a_valid_id")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid id");
+      });
+  });
+  test("DELETE: 404. Sends appropriate error message if given valid but non-existent id", () => {
+    return request(app)
+      .delete("/api/comments/999")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Id not found");
+      });
+  });
+});
