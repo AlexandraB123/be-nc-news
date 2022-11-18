@@ -115,15 +115,12 @@ describe("/api/articles", () => {
           expect(body.articles).toBeSorted({ key: "title", descending: true });
         });
     });
-    test("GET: 200. Default sorts by date_created if given invalid search sort_by column", () => {
+    test("GET: 404. Sends appropriate error message if given invalid search sort_by column", () => {
       return request(app)
         .get("/api/articles?sort_by=not_a_column")
-        .expect(200)
+        .expect(404)
         .then(({ body }) => {
-          expect(body.articles).toBeSorted({
-            key: "created_at",
-            descending: true,
-          });
+          expect(body.msg).toBe("sort_by column not found");
         });
     });
     test("GET: 200. Sorts by ascending if given search order of asc", () => {
@@ -145,15 +142,12 @@ describe("/api/articles", () => {
           });
         });
     });
-    test("GET: 200. Default sorts by descending if given invalid search order", () => {
+    test("GET: 400. Sends appropriate error message if given invalid search order", () => {
       return request(app)
         .get("/api/articles?order=not_asc_or_desc")
-        .expect(200)
+        .expect(400)
         .then(({ body }) => {
-          expect(body.articles).toBeSorted({
-            key: "created_at",
-            descending: true,
-          });
+          expect(body.msg).toBe("invalid order");
         });
     });
   });

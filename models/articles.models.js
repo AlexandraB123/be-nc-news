@@ -11,8 +11,9 @@ exports.fetchArticles = (sort_by, order, topic) => {
     "created_at",
     "votes",
   ];
-  if (!validColumns.includes(sort_by)) sort_by = "created_at";
-  if (!["asc", "desc"].includes(order)) order = "desc";
+
+  if (!sort_by) sort_by = "created_at";
+  if (!order) order = "desc";
 
   let queryString = `
     SELECT articles.article_id, articles.author, articles.title, articles.topic, articles.created_at, articles.votes, CAST(COUNT(comments.comment_id) AS INT) AS comment_count 
@@ -24,6 +25,12 @@ exports.fetchArticles = (sort_by, order, topic) => {
     .then(() => {
       if (topic !== undefined) {
         return checkItemExists(topic, "topic", "topics", "slug");
+      }
+      if (!validColumns.includes(sort_by)) {
+        return Promise.reject({ status: 404, msg: "sort_by column not found"})
+      }
+      if (!["asc", "desc"].includes(order)) {
+        return Promise.reject({ status: 400, msg: "invalid order"})
       }
     })
     .then(() => {
