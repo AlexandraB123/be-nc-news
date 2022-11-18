@@ -10,11 +10,13 @@ const {
   patchArticle,
 } = require("./controllers/articles.controllers.js");
 const { getUsers } = require("./controllers/users.controllers.js");
+const { getEndpoints } = require("./controllers/api.controllers.js");
 const express = require("express");
 const app = express();
 app.use(express.json());
 
 // endpoints
+app.get("/api", getEndpoints);
 app.get("/api/health-check", checkConnection);
 app.get("/api/topics", getTopics);
 app.get("/api/articles", getArticles);

@@ -2,6 +2,9 @@
   "GET /api": {
     "description": "serves up a json representation of all the available endpoints of the api"
   },
+  "GET /api/health-check": {
+    "description": "sends 'connection ok' response"
+  },
   "GET /api/topics": {
     "description": "serves an array of all topics",
     "queries": [],
@@ -10,16 +13,109 @@
     }
   },
   "GET /api/articles": {
-    "description": "serves an array of all topics",
-    "queries": ["author", "topic", "sort_by", "order"],
+    "description": "serves an array of all articles, default sorted by date in descending order",
+    "queries": ["topic", "sort_by", "order"],
     "exampleResponse": {
       "articles": [
         {
+          "article_id": 1,
           "title": "Seafood substitutions are increasing",
           "topic": "cooking",
           "author": "weegembump",
           "body": "Text from the article..",
-          "created_at": 1527695953341
+          "created_at": 1527695953341,
+          "votes": 5,
+          "comment_count": 3
+        }
+      ]
+    }
+  },
+  "GET /api/articles/:article_id": {
+    "description": "serves requested article object",
+    "queries": [],
+    "exampleResponse": {
+      "article": [
+        {
+          "article_id": 1,
+          "title": "Seafood substitutions are increasing",
+          "topic": "cooking",
+          "author": "weegembump",
+          "body": "Text from the article..",
+          "created_at": 1527695953341,
+          "votes": 5,
+          "comment_count": 2
+        }
+      ]
+    }
+  },
+  "PATCH /api/articles/:article_id": {
+    "description": "increments votes by given number of new votes (can be positive or negative) for the given article and responds with the updated article object",
+    "queries": [],
+    "exampleRequest": {
+      "inc_votes": 5
+    },
+    "exampleResponse": {
+      "article": [
+        {
+          "article_id": 1,
+          "title": "Seafood substitutions are increasing",
+          "topic": "cooking",
+          "author": "weegembump",
+          "body": "Text from the article..",
+          "created_at": 1527695953341,
+          "votes": 10
+        }
+      ]
+    }
+  },
+  "GET /api/articles/:article_id/comments": {
+    "description": "serves array of comments for the given article_id, sorted by date created with most recent comments first",
+    "queries": [],
+    "exampleResponse": {
+      "comments": [
+        {
+          "comment_id": 1,
+          "votes": 2,
+          "created_at": 1527695953359,
+          "author": "weegembump",
+          "body": "Text of the comment"
+        }
+      ]
+    }
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "posts a new comment for the given article_id and responds with the posted comment",
+    "queries": [],
+    "exampleRequest": {
+      "username": "happyAmy2016",
+      "body": "A comment on the article"
+    },
+    "exampleResponse": {
+      "comment": [
+        {
+          "comment_id": 72,
+          "article_id": 1,
+          "created_at": 152769595335,
+          "votes": 0,
+          "author": "happyAmy2016",
+          "body": "This article is great"
+        }
+      ]
+    }
+  },
+  "DELETE /api/comments/:comment_id": {
+    "description": "deletes the given comment by comment_id (no content in response)",
+    "queries": []
+  },
+  "GET /api/users": {
+    "description": "serves an array of users",
+    "queries": [],
+    "exampleResponse": {
+      "users": [
+        {
+          "username": "happyAmy2016",
+          "name": "Amy Happy",
+          "avatar_url": "https://vignette1.wikia.nocookie.net/mrmen/images/7/7f/Mr_Happy.jpg/revision/latest?cb=20140102171729"
         }
       ]
     }

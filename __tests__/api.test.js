@@ -7,7 +7,7 @@ const data = require("../db/data/test-data");
 beforeEach(() => seed(data));
 afterAll(() => db.end());
 
-describe("/api/health-check", () => {
+describe("GET /api/health-check", () => {
   it("GET:200. Responds with message 'connection ok'", () => {
     return request(app)
       .get("/api/health-check")
@@ -15,6 +15,29 @@ describe("/api/health-check", () => {
       .then((res) => {
         expect(res.body).toEqual({
           message: "connection ok",
+        });
+      });
+  });
+});
+
+describe.skip("GET /api", () => {
+  test("GET: 200. Responds with JSON describing all available endpoints", () => {
+    return request(app)
+      .get("/api")
+      .expect(200)
+      .then((res) => {
+        const parsedJson = JSON.parse(res);
+        expect(parsedJson).toMatchObject({
+          "GET /api": expect.any(Object),
+          "GET /api/health-check": expect.any(Object),
+          "GET /api/topics": expect.any(Object),
+          "GET /api/articles": expect.any(Object),
+          "GET /api/articles/:article_id": expect.any(Object),
+          "PATCH /api/articles/:article_id": expect.any(Object),
+          "GET /api/articles/:article_id/comments": expect.any(Object),
+          "POST /api/articles/:article_id/comments": expect.any(Object),
+          "DELETE /api/comments/:comment_id": expect.any(Object),
+          "GET /api/users": expect.any(Object),
         });
       });
   });
