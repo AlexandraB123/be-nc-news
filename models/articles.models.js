@@ -48,7 +48,7 @@ exports.fetchArticleById = (article_id) => {
   FROM articles
   LEFT JOIN comments ON articles.article_id = comments.article_id
   WHERE articles.article_id = $1
-  GROUP BY articles.author, articles.title, articles.article_id, articles.topic, articles.body, articles.created_at, articles.votes;
+  GROUP BY articles.article_id;
 `;
   return db.query(queryString, [article_id]).then((result) => {
     if (result.rows.length === 0) {

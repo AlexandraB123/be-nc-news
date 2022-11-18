@@ -192,7 +192,15 @@ describe("/api/articles/:article_id", () => {
             topic: expect.any(String),
             created_at: expect.any(String),
             votes: expect.any(Number),
-            comment_count: 11,
+          });
+        });
+    });
+    test("GET: 200. Response article includes comment_count", () => {
+      return request(app)
+        .get("/api/articles/1")
+        .then((response) => {
+          expect(response.body.article).toMatchObject({
+            comment_count: expect.any(Number),
           });
         });
     });
